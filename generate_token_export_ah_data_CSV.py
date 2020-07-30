@@ -5,6 +5,9 @@ from requests.auth import HTTPBasicAuth
 import re
 import csv
 
+CLIENT_ID = '4765849c9d3a4ae7a1132515105cba14'
+CLIENT_SECRET = 'WZrsyckvjFLXVyNxEnGKCuS3is8I5Spw'
+
 
 def get_ah_data(server_id, access_token, save_as_csv=False):
     # Request for AH data of specific server_id
@@ -53,7 +56,7 @@ def find_realm_ID(name, connected_realm_IDs, access_token):
                 return id, realm['id']
 
 
-def retrieve_token(client_id, client_secret, region='eu'):
+def retrieve_token(client_id=CLIENT_ID, client_secret=CLIENT_SECRET, region='eu'):
     url = f'https://{region}.battle.net/oauth/token'
     body = {'grant_type': 'client_credentials'}
     auth = HTTPBasicAuth(client_id, client_secret)
@@ -67,9 +70,6 @@ def make_request(url, search=0):
     response = requests.get(base_url + url)
     return response.json()
 
-
-CLIENT_ID = '4765849c9d3a4ae7a1132515105cba14'
-CLIENT_SECRET = 'WZrsyckvjFLXVyNxEnGKCuS3is8I5Spw'
 
 if __name__ == '__main__':
     # token_info is a dictionary with k, v pairs:
@@ -92,22 +92,3 @@ if __name__ == '__main__':
 
     # Doomhammer server AH data
     ah_data = get_ah_data(server_id, access_token, save_as_csv=True)
-
-    # Compare vendor and AH prices
-    auction_items = ah_data['auctions']  # List of all AH items
-
-    for item in auction_items:
-        auction_id = item['id']
-        item_id = item['item']['id']
-        quantity = item['quantity']
-        ah_unit_price = item['unit_price']
-
-        # GET item info from API
-        item_info = requests.get(
-            f'https://eu.api.blizzard.com/data/wow/item/{item_id}?namespace=static-eu&locale=en_GB&access_token={access_token}').json()
-        # time.sleep(0.01)
-        vendor_sell_price = item_info['sell_price']
-        item_name = item_info['name']
-        if ah_unit_price < vendor_sell_price:
-            price_diff = vendor_sell_price - ah_unit_price
-            print(f'{item_name}, price difference:{price_diff}, quantity: {quantity}')
