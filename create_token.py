@@ -3,8 +3,41 @@ from requests.auth import HTTPBasicAuth
 import re
 
 
-def find_realm_ID():
-    pass
+def get_ah_data(server_id, access_token):
+    # Request for AH data of specific server_id
+    ah_data = make_request(
+        f'{server_id}/auctions?namespace=dynamic-eu&locale=en_GB&access_token={access_token}')
+    return ah_data
+
+
+def get_connected_realm_ids(access_token):
+    # Retrieve ID's of available EU servers
+    connected_realm_index = make_request(
+        f'index?namespace=dynamic-eu&locale=en_GB&access_token={access_token}')
+
+    # Extract all connected realm ID's from realm indexes.
+    connected_realm_IDs = list()
+    for entry in connected_realm_index['connected_realms']:
+        link = entry['href']
+        id = re.findall(r'\d+', link)[0]
+        connected_realm_IDs.append(id)
+    return connected_realm_IDs
+
+
+def find_realm_ID(name, connected_realm_IDs, access_token):
+    found = 0
+    REALM_NAME = name
+    for id in connected_realm_IDs:
+        if found == 1:
+            break
+        # Retrieve info for specific server ID
+        connected_realm_info = make_request(
+            f'{id}?namespace=dynamic-eu&locale=en_GB&access_token={access_token}')
+        realms = connected_realm_info['realms']
+        for realm in realms:
+            if realm['name'] == REALM_NAME:
+                print(f'Connected realm id: {id}, Realm id: {realm["id"]}')
+                return id, realm['id']
 
 
 def retrieve_token(client_id, client_secret, region='eu'):
@@ -36,23 +69,13 @@ token_info = retrieve_token(client_id=CLIENT_ID,
 
 access_token = token_info['access_token']
 
-# Retrieve ID's of available EU servers
-connected_realm_index = make_request(
-    f'index?namespace=dynamic-eu&locale=en_GB&access_token={access_token}')
+connected_realm_IDs = get_connected_realm_ids(access_token)
 
-# Extract all connected realm ID's from realm indexes.
-connected_realm_IDs = list()
-for entry in connected_realm_index['connected_realms']:
-    link = entry['href']
-    id = re.findall(r'\d+', link)[0]
-    connected_realm_IDs.append(id)
+# Find realm ID by its name
+# server_id = find_realm_ID('Doomhammer', connected_realm_IDs, access_token)
 
-server_id = 1302  # Archimonde EU server ID
+server_id = 1402  # Doomhammer EU server ID, found by find_realm_ID function
 
-# Retrieve info for specific server ID
-connected_realm_info = make_request(
-    f'{server_id}?namespace=dynamic-eu&locale=en_GB&access_token={access_token}')
-
-# Archimonde server AH data
-ah_data = make_request(
-    f'{server_id}/auctions?namespace=dynamic-eu&locale=en_GB&access_token={access_token}')
+# Doomhammer server AH data
+ah_data = get_ah_data(server_id, access_token)
+print('Hello')
