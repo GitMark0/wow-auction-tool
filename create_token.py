@@ -1,12 +1,25 @@
+import time
+
 import requests
 from requests.auth import HTTPBasicAuth
 import re
+import csv
 
 
-def get_ah_data(server_id, access_token):
+def get_ah_data(server_id, access_token, save_as_csv=False):
     # Request for AH data of specific server_id
     ah_data = make_request(
         f'{server_id}/auctions?namespace=dynamic-eu&locale=en_GB&access_token={access_token}')
+
+    if save_as_csv:
+        auctions = ah_data['auctions']
+        with open('auction_house_items.csv', 'w', encoding='utf8', newline='') as output_file:
+            fc = csv.DictWriter(output_file,
+                                fieldnames=['id', 'item', 'quantity', 'unit_price', 'buyout', 'bid', 'time_left'],
+
+                                )
+            fc.writeheader()
+            fc.writerows(auctions)
     return ah_data
 
 
@@ -78,7 +91,7 @@ if __name__ == '__main__':
     server_id = 1402  # Doomhammer EU server ID, found by find_realm_ID function
 
     # Doomhammer server AH data
-    ah_data = get_ah_data(server_id, access_token)
+    ah_data = get_ah_data(server_id, access_token, save_as_csv=True)
 
     # Compare vendor and AH prices
     auction_items = ah_data['auctions']  # List of all AH items
@@ -87,10 +100,14 @@ if __name__ == '__main__':
         auction_id = item['id']
         item_id = item['item']['id']
         quantity = item['quantity']
-        unit_price = item['unit_price']
+        ah_unit_price = item['unit_price']
 
         # GET item info from API
         item_info = requests.get(
             f'https://eu.api.blizzard.com/data/wow/item/{item_id}?namespace=static-eu&locale=en_GB&access_token={access_token}').json()
-
-
+        # time.sleep(0.01)
+        vendor_sell_price = item_info['sell_price']
+        item_name = item_info['name']
+        if ah_unit_price < vendor_sell_price:
+            price_diff = vendor_sell_price - ah_unit_price
+            print(f'{item_name}, price difference:{price_diff}, quantity: {quantity}')
