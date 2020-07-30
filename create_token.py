@@ -1,5 +1,10 @@
 import requests
 from requests.auth import HTTPBasicAuth
+import re
+
+
+def find_realm_ID():
+    pass
 
 
 def retrieve_token(client_id, client_secret, region='eu'):
@@ -11,8 +16,8 @@ def retrieve_token(client_id, client_secret, region='eu'):
     return response.json()
 
 
-def make_request(url):
-    base_url = 'https://eu.api.blizzard.com/data/wow/connected-realm/'
+def make_request(url, search=0):
+    base_url = 'https://eu.api.blizzard.com/data/wow/{}connected-realm/'.format('' if search == 0 else 'search/')
     response = requests.get(base_url + url)
     return response.json()
 
@@ -32,8 +37,15 @@ token_info = retrieve_token(client_id=CLIENT_ID,
 access_token = token_info['access_token']
 
 # Retrieve ID's of available EU servers
-connected_realm_IDs = make_request(
+connected_realm_index = make_request(
     f'index?namespace=dynamic-eu&locale=en_GB&access_token={access_token}')
+
+# Extract all connected realm ID's from realm indexes.
+connected_realm_IDs = list()
+for entry in connected_realm_index['connected_realms']:
+    link = entry['href']
+    id = re.findall(r'\d+', link)[0]
+    connected_realm_IDs.append(id)
 
 server_id = 1302  # Archimonde EU server ID
 
@@ -44,4 +56,3 @@ connected_realm_info = make_request(
 # Archimonde server AH data
 ah_data = make_request(
     f'{server_id}/auctions?namespace=dynamic-eu&locale=en_GB&access_token={access_token}')
-print('Hello')
