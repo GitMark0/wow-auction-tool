@@ -58,24 +58,25 @@ def make_request(url, search=0):
 CLIENT_ID = '4765849c9d3a4ae7a1132515105cba14'
 CLIENT_SECRET = 'WZrsyckvjFLXVyNxEnGKCuS3is8I5Spw'
 
-# token_info is a dictionary with k, v pairs:
-# "access_token": "USVb1nGO9kwQlhNRRnI4iWVy2UV5j7M6h7",
-# "token_type": "bearer",
-# "expires_in": 86399,
-# "scope": "example.scope"
+if __name__ == '__main__':
+    # token_info is a dictionary with k, v pairs:
+    # "access_token": "USVb1nGO9kwQlhNRRnI4iWVy2UV5j7M6h7",
+    # "token_type": "bearer",
+    # "expires_in": 86399,
+    # "scope": "example.scope"
 
-token_info = retrieve_token(client_id=CLIENT_ID,
-                            client_secret=CLIENT_SECRET)
+    token_info = retrieve_token(client_id=CLIENT_ID,
+                                client_secret=CLIENT_SECRET)
 
-access_token = token_info['access_token']
+    access_token = token_info['access_token']
 
-connected_realm_IDs = get_connected_realm_ids(access_token)
+    connected_realm_IDs = get_connected_realm_ids(access_token)
 
-# Find realm ID by its name
-# server_id = find_realm_ID('Doomhammer', connected_realm_IDs, access_token)
+    # Find realm ID by its name
+    # server_id = find_realm_ID('Doomhammer', connected_realm_IDs, access_token)
 
-server_id = 1402  # Doomhammer EU server ID, found by find_realm_ID function
+    server_id = 1402  # Doomhammer EU server ID, found by find_realm_ID function
 
-# Doomhammer server AH data
-ah_data = get_ah_data(server_id, access_token)
-print('Hello')
+    # Doomhammer server AH data
+    ah_data = get_ah_data(server_id, access_token)
+    print('Hello')
