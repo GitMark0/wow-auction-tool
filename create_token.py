@@ -79,4 +79,18 @@ if __name__ == '__main__':
 
     # Doomhammer server AH data
     ah_data = get_ah_data(server_id, access_token)
-    print('Hello')
+
+    # Compare vendor and AH prices
+    auction_items = ah_data['auctions']  # List of all AH items
+
+    for item in auction_items:
+        auction_id = item['id']
+        item_id = item['item']['id']
+        quantity = item['quantity']
+        unit_price = item['unit_price']
+
+        # GET item info from API
+        item_info = requests.get(
+            f'https://eu.api.blizzard.com/data/wow/item/{item_id}?namespace=static-eu&locale=en_GB&access_token={access_token}').json()
+
+
