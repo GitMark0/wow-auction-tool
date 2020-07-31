@@ -86,7 +86,7 @@ if __name__ == '__main__':
     connected_realm_IDs = get_connected_realm_ids(access_token)
 
     # Find realm ID by its name
-    # server_id = find_realm_ID('Doomhammer', connected_realm_IDs, access_token)
+    # server_id = find_realm_ID('Kazzak', connected_realm_IDs, access_token)[0]
 
     server_id = 1402  # Doomhammer EU server ID, found by find_realm_ID function
 

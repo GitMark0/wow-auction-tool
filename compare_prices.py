@@ -31,9 +31,9 @@ for index, row in vendor_sell_prices.iterrows():
         unit_price = less_than_vendor['unit_price'].to_numpy()
         quantity = less_than_vendor['quantity'].to_numpy()
         diff = (np.array(vendor_sell_price) - unit_price) * quantity
-        profit = diff.sum()
+        profit = diff.sum()/10000
         total_profit += profit
-        print(f'\n{item_name}; Vendor sell price: {vendor_sell_price}; Profit: {profit} ')
+        print(f'\n{item_name}; Vendor sell price: {vendor_sell_price}; Profit in gold: {profit} ')
         print(less_than_vendor)
 
-print(f'\nTotal profit: {total_profit}')
+print(f'\nTotal profit in gold: {total_profit}')
