@@ -3,6 +3,8 @@ from requests.auth import HTTPBasicAuth
 import re
 import csv
 
+# https://wow-query.dev/
+
 CLIENT_ID = '4765849c9d3a4ae7a1132515105cba14'
 CLIENT_SECRET = 'WZrsyckvjFLXVyNxEnGKCuS3is8I5Spw'
 
@@ -14,7 +16,7 @@ def get_ah_data(server_id, access_token, save_as_csv=False):
 
     if save_as_csv:
         auctions = ah_data['auctions']
-        with open('auction_house_items.csv', 'w', encoding='utf8', newline='') as output_file:
+        with open('datasets/auction_house_items.csv', 'w', encoding='utf8', newline='') as output_file:
             fc = csv.DictWriter(output_file,
                                 fieldnames=['id', 'item', 'quantity', 'unit_price', 'buyout', 'bid', 'time_left'],
 

@@ -5,8 +5,8 @@ import requests
 from generate_token_export_ah_data_CSV import retrieve_token
 import numpy as np
 
-vendor_sell_prices = pd.read_csv('export.csv')
-ah_data = pd.read_csv('auction_house_items.csv')
+vendor_sell_prices = pd.read_csv('datasets/export.csv')
+ah_data = pd.read_csv('datasets/auction_house_items.csv')
 
 ah_item_ids = ah_data['item'].tolist()
 ah_item_ids = [int(re.findall(r'\d+', item)[0]) for item in ah_item_ids]
@@ -16,6 +16,9 @@ ah_data.insert(1, 'item_id', ah_item_ids)
 access_token = retrieve_token()['access_token']
 
 total_profit = 0
+ah_data = ah_data.drop('id', axis=1)
+ah_data = ah_data.rename({'item_id': 'id'})
+merged_df = ah_data.merge(vendor_sell_prices, on='id', how='left')
 
 for index, row in vendor_sell_prices.iterrows():
     if math.isnan(row['id']) or math.isnan(row['sell_price']):
