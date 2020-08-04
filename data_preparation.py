@@ -16,7 +16,14 @@ anchor_data = pd.read_csv('datasets/anchor-weed.csv', parse_dates=True, squeeze=
 anchor_data = anchor_data.drop('Unnamed: 0', axis=1)
 
 # normalize price and quantity
-anchor_data[['quantity', 'price']] = scaler.fit_transform(anchor_data[['quantity', 'price']])
+# drop first 12 rows -> 0 values
+mean_quantity = anchor_data['quantity'].mean(skipna=True)
+mean_price = anchor_data['price'].mean(skipna=True)
+anchor_data['quantity'] = anchor_data['quantity'].replace(0, mean_quantity)
+anchor_data['price'] = anchor_data['price'].replace(0, mean_price)
+
+anchor_data[['quantity']] = scaler.fit_transform(anchor_data[['quantity']])
+anchor_data['price'] = np.log(anchor_data['price'])
 
 # sine/cosine transform of dow and month
 anchor_data['date'] = pd.to_datetime(anchor_data['date'])
@@ -32,7 +39,6 @@ anchor_data.columns = [*anchor_data.columns[:-1], 'price+1']
 # drop redundant columns
 anchor_data = anchor_data.drop(['date', 'month', 'dow'], axis=1)
 
-# drop first 12 rows -> 0 values and save data
-anchor_data = anchor_data.iloc[12:]
-anchor_data.to_csv('datasets/anchor-weed_prepared.csv')
-
+# split and save data
+anchor_data = anchor_data.iloc[13:]
+anchor_data.to_csv('datasets/anchor-weed-prepared.csv')
